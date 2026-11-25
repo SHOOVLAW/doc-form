@@ -1,0 +1,146 @@
+<!doctype html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פנייה למשרד | שוב – חברת עורכי דין</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="https://shoov.co.il/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* צבעים וגופן כמו באתר shoov.co.il */
+:root{--navy:#172a4f;--ink:#0f1624;--mut:#576175;--line:#d1d6e0;--bg:#f6f7f9;--gold:#dfa620;--ok:#15803d;--bad:#b91c1c}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);font:16px/1.6 Rubik,Heebo,Arial,sans-serif;color:var(--ink)}
+.wrap{max-width:620px;margin:0 auto;padding:24px 16px 48px}
+.brand{text-align:center;margin:4px 0 20px}
+.brand img{height:130px;width:auto;display:inline-block;margin:-37px 0 -40px}
+.brand .txt{display:none;font-size:28px;font-weight:700;color:var(--navy);letter-spacing:3px}
+.brand .ln{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;color:var(--mut);font-size:13px;letter-spacing:4px}
+.brand .ln:before,.brand .ln:after{content:"";width:36px;height:1px;background:var(--gold)}
+.card{background:#fff;border:1px solid #e6e9ef;border-radius:16px;padding:26px 24px;box-shadow:0 8px 30px rgba(15,22,36,.06)}
+h1{font-size:24px;font-weight:700;margin:0 0 4px;color:var(--navy)}
+.lead{color:var(--mut);margin:0 0 18px;font-size:15px;font-weight:300}
+label{display:block;font-weight:500;font-size:14.5px;margin:14px 0 6px}
+label small{font-weight:300;color:var(--mut)}
+input,select,textarea{width:100%;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink);outline:none;-webkit-appearance:none;appearance:none}
+select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23576175' stroke-width='1.6' fill='none'/%3E%3C/svg%3E") no-repeat left 14px center;padding-left:36px}
+input:focus,select:focus,textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.10)}
+input[dir=ltr]{text-align:right}
+textarea{min-height:120px;resize:vertical}
+.row{display:flex;gap:12px}.row>div{flex:1;min-width:0}
+.drop{border:1.5px dashed #c3cad8;border-radius:12px;padding:20px;text-align:center;color:var(--mut);cursor:pointer;background:#fafbfc}
+.drop b{color:var(--navy);font-weight:500}
+.files{margin-top:10px}
+.f{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:6px 0;font-size:14px}
+.f .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.f .s{color:var(--mut);font-size:12.5px}.f .x{border:0;background:none;color:var(--mut);font-size:20px;cursor:pointer;padding:0 6px}
+.f.ok .s{color:var(--ok)}.f.err{border-color:#fecaca;background:#fff7f7}.f.err .s{color:var(--bad)}
+.btn{width:100%;margin-top:22px;background:var(--navy);color:#fff;border:0;border-radius:9999px;padding:15px;font:500 17px Rubik,Arial,sans-serif;cursor:pointer;transition:background .15s}
+.btn:hover{background:#0f1f3d}.btn:disabled{opacity:.6;cursor:default}
+.msg{margin-top:12px;font-weight:500;text-align:center}.msg.bad{color:var(--bad)}
+.note{color:var(--mut);font-size:12.5px;margin-top:14px;text-align:center;font-weight:300}
+.done{text-align:center;padding:10px 0}
+.done .ic{font-size:44px}.done .ref{display:inline-block;margin-top:8px;padding:6px 16px;border-radius:9999px;background:#f6f1e3;color:var(--navy);font-weight:700;letter-spacing:1px}
+.foot{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px;font-weight:300}
+.foot a{color:var(--navy);text-decoration:none}
+@media(max-width:560px){.wrap{padding:16px 12px 40px}.row{flex-direction:column;gap:0}.card{padding:20px 16px;border-radius:14px}.brand img{height:104px;margin:-30px 0 -32px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><img src="https://shoov.co.il/assets/logo-shoov-adYTg36Z.png" alt="SHOOV Law Firm" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="txt">SHOOV</div><div class="ln">חברת עורכי דין</div></div>
+  <div class="card" id="card">
+    <h1>פנייה למשרד</h1>
+    <p class="lead">כאן שולחים לנו הודעה, מסמכים – או גם וגם. נחזור אליך בהקדם.</p>
+    <div class="row">
+      <div><label for="name">שם מלא</label><input id="name" autocomplete="name"></div>
+      <div><label for="tz">תעודת זהות</label><input id="tz" dir="ltr" inputmode="numeric" pattern="[0-9]*" maxlength="9"></div>
+    </div>
+    <div class="row">
+      <div><label for="phone">טלפון נייד</label><input id="phone" type="tel" dir="ltr" inputmode="tel" autocomplete="tel" placeholder="05X-XXXXXXX"></div>
+      <div><label for="email">מייל <small>(לא חובה)</small></label><input id="email" type="email" dir="ltr" inputmode="email" autocomplete="email"></div>
+    </div>
+    <label for="topic">נושא הפנייה</label>
+    <select id="topic"><option value="">בחירה…</option></select>
+    <label for="text">מה ברצונך למסור?</label>
+    <textarea id="text" placeholder="אפשר לכתוב כאן הודעה למשרד"></textarea>
+    <label>מסמכים <small>(PDF, תמונה או Word · עד 10 קבצים)</small></label>
+    <div class="drop" id="drop"><b>📎 צירוף מסמכים או צילום</b><br><small>לחיצה כאן – אפשר לצלם ישר מהטלפון</small></div>
+    <input id="fi" type="file" multiple accept="application/pdf,image/*,.doc,.docx" style="display:none">
+    <div class="files" id="files"></div>
+    <button class="btn" id="go" type="button">שליחה</button>
+    <div class="msg" id="msg"></div>
+    <div class="note">הפרטים נשמרים במערכת המשרד בלבד ומשמשים לטיפול בפנייה.</div>
+  </div>
+  <div class="foot"><a href="https://shoov.co.il" target="_blank">shoov.co.il</a></div>
+</div>
+<script>
+(function () {
+  var TOPICS = ['מה מצב התיק שלי כרגע?', 'לא אוכל להגיע לוועדה', 'אשמח לקבוע פגישה עם צוות המשרד', 'קיבלתי זימון לוועדה רפואית', 'קיבלתי מכתב / החלטה מביטוח לאומי', 'יש לי מסמכים רפואיים חדשים להעביר', 'יש שינוי במצבי הרפואי (ניתוח, אשפוז, החמרה)', 'נקבע לי תור לרופא מומחה / בדיקה', 'שינוי בפרטים האישיים (טלפון, מייל, כתובת, חשבון בנק)', 'שאלה לגבי תשלום / קצבה / שכר טרחה', 'אבקש שיחזרו אליי טלפונית', 'אחר'];
+  var $ = function (id) { return document.getElementById(id); };
+  var E = function (t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  TOPICS.forEach(function (t) { $('topic').appendChild(new Option(t, t)); });
+  var FILES = []; // {file, ok, err, el}
+  var kb = function (n) { return n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.round(n / 1024) + 'KB'; };
+  var okType = function (f) { return /^(application\/pdf|image\/|application\/(msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document))/.test(f.type) || /\.(pdf|jpe?g|png|heic|heif|webp|docx?)$/i.test(f.name); };
+  var tzOk = function (s) { var t = String(s).replace(/\D/g, ''); if (t.length < 5 || t.length > 9) return false; t = ('000000000' + t).slice(-9); var sum = 0; for (var i = 0; i < 9; i++) { var d = Number(t[i]) * ((i % 2) + 1); if (d > 9) d -= 9; sum += d; } return sum % 10 === 0; };
+  var phOk = function (s) { return /^05\d{8}$/.test(String(s).replace(/\D/g, '').replace(/^972/, '0')); };
+
+  var drawFile = function (x) {
+    x.el.className = 'f' + (x.err ? ' err' : x.ok ? ' ok' : '');
+    x.el.innerHTML = ''; x.el.appendChild(E('span', '', x.err ? '⚠️' : '📄'));
+    var n = E('div', 'n'); n.appendChild(document.createTextNode(x.file.name)); n.appendChild(E('div', 's', x.err || (x.st || kb(x.file.size)))); x.el.appendChild(n);
+    var rm = E('button', 'x', '×'); rm.type = 'button'; rm.title = 'הסרה'; rm.onclick = function () { FILES = FILES.filter(function (y) { return y !== x; }); x.el.remove(); }; x.el.appendChild(rm);
+  };
+  var check = function (x) { // בדיקה לפני שליחה: סוג, גודל, ותמונה חדה מספיק
+    if (!okType(x.file)) { x.err = 'סוג קובץ לא נתמך'; return drawFile(x); }
+    if (x.file.size > 20 * 1048576) { x.err = 'הקובץ גדול מדי (עד 20MB)'; return drawFile(x); }
+    if (/^image\//.test(x.file.type) && !/heic|heif/i.test(x.file.type)) {
+      var img = new Image(); var u = URL.createObjectURL(x.file);
+      img.onload = function () { URL.revokeObjectURL(u); if (Math.min(img.naturalWidth, img.naturalHeight) < 600 || x.file.size < 15000) x.err = 'התמונה קטנה או לא חדה – נא לצלם שוב מקרוב'; else x.ok = true; drawFile(x); };
+      img.onerror = function () { URL.revokeObjectURL(u); x.ok = true; drawFile(x); }; img.src = u;
+    } else { x.ok = true; drawFile(x); }
+  };
+  $('drop').onclick = function () { $('fi').click(); };
+  $('fi').onchange = function () {
+    [].forEach.call($('fi').files, function (f) { if (FILES.length >= 10) return; var x = { file: f, el: E('div', 'f') }; FILES.push(x); $('files').appendChild(x.el); drawFile(x); check(x); });
+    $('fi').value = '';
+  };
+
+  var say = function (t, bad) { $('msg').className = 'msg' + (bad ? ' bad' : ''); $('msg').textContent = t; };
+  // שליחה לקליטה בגוגל (SHOOV-העלאה). text/plain כדי שלא תידרש בקשת CORS מקדימה.
+  var API = 'https://script.google.com/macros/s/AKfycbwiARoOPczzGXrj8_lK9SREw0xcWK65FKBCrigJeS03_xZCEFgDhxlL6ODnT7ESQ4-oWA/exec';
+  var call = function (fn, a, b) {
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, a: a, b: b }) })
+      .then(function (r) { return r.json(); }, function () { throw new Error('אין חיבור לרשת – נא לנסות שוב'); })
+      .then(function (j) { if (!j.ok) throw new Error(j.err || 'משהו השתבש – נא לנסות שוב'); return j.r; });
+  };
+  var b64 = function (f) { return new Promise(function (ok, no) { var r = new FileReader(); r.onload = function () { ok(String(r.result).split(',')[1] || ''); }; r.onerror = no; r.readAsDataURL(f); }); };
+
+  $('go').onclick = function () {
+    var p = { name: $('name').value.trim(), tz: $('tz').value, phone: $('phone').value, email: $('email').value.trim(), topic: $('topic').value, text: $('text').value.trim() };
+    if (p.name.length < 2) return say('נא למלא שם מלא', true);
+    if (!tzOk(p.tz)) return say('מספר תעודת הזהות אינו תקין', true);
+    if (!phOk(p.phone)) return say('מספר הנייד אינו תקין', true);
+    if (FILES.some(function (x) { return x.err; })) return say('יש קובץ עם בעיה – נא להסיר אותו או לצלם שוב', true);
+    if (FILES.some(function (x) { return !x.ok; })) return say('רגע, הקבצים עדיין נבדקים…', true);
+    if (!p.text && !FILES.length) return say('נא לכתוב הודעה או לצרף מסמך', true);
+    p.nfiles = FILES.length; $('go').disabled = true; say('שולח…');
+    var ref = '';
+    call('start', p).then(function (r) { ref = r.ref; var chain = Promise.resolve();
+      FILES.forEach(function (x, i) { chain = chain.then(function () { x.st = 'מעלה…'; drawFile(x); say('מעלה מסמך ' + (i + 1) + ' מתוך ' + FILES.length + '…');
+        return b64(x.file).then(function (d) { return call('addFile', r.id, { name: x.file.name, mime: x.file.type || (/\.pdf$/i.test(x.file.name) ? 'application/pdf' : 'image/jpeg'), data: d }); }).then(function () { x.st = '✓ נשלח'; drawFile(x); }); }); });
+      return chain.then(function () { return FILES.length ? call('finish', r.id) : true; });
+    }).then(function () {
+      var c = $('card'); c.innerHTML = '';
+      var d = E('div', 'done'); d.appendChild(E('div', 'ic', '✅')); d.appendChild(E('h1', '', 'הפנייה התקבלה – תודה!'));
+      d.appendChild(E('p', 'lead', 'הצוות שלנו יעבור על הפנייה ויחזור אליך בהקדם.')); d.appendChild(E('div', 'ref', 'מספר פנייה: ' + ref));
+      var again = E('button', 'btn', 'פנייה נוספת'); again.type = 'button'; again.onclick = function () { location.reload(); }; d.appendChild(again); c.appendChild(d);
+    }).catch(function (e) { $('go').disabled = false; say((e && e.message) || 'משהו השתבש – נא לנסות שוב', true); });
+  };
+})();
+</script>
+</body>
+</html>
