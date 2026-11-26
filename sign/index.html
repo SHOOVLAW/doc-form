@@ -123,7 +123,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   function bytesToB64(u) { var s = '', ch = 0x8000; for (var i = 0; i < u.length; i += ch) s += String.fromCharCode.apply(null, u.subarray(i, i + ch)); return btoa(s); }
   function fmt(d) { var z = function (n) { return ('0' + n).slice(-2); }; return z(d.getDate()) + '.' + z(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()); }
 
-  if (!/^[a-f0-9]{64}$/.test(TOK)) { $('s0').innerHTML = '<h1>הקישור אינו תקין</h1><p class="lead">כדאי לפתוח שוב את הקישור מההודעה שקיבלת מהמשרד.</p>'; return; }
+  if (!/^[a-f0-9]{64}$/.test(TOK) && !/^[a-z0-9]{10}$/.test(TOK)) { $('s0').innerHTML = '<h1>הקישור אינו תקין</h1><p class="lead">כדאי לפתוח שוב את הקישור מההודעה שקיבלת מהמשרד.</p>'; return; }
   history.replaceState(null, '', location.pathname); // הקישור הסודי לא נשאר בשורת הכתובת
 
   call('open', TOK, navigator.userAgent).then(function (r) {
