@@ -64,6 +64,10 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
       <div id="sendBox"><button class="btn" id="codeWa" hidden>💬 שלחו לי קוד בוואטסאפ</button><button class="btn" id="sendCode">📧 שלחו לי קוד למייל</button></div>
       <div id="codeBox" hidden>
         <p class="lead" style="margin:14px 0 8px" id="sentTo"></p>
+        <div id="waHelp" class="doc" hidden style="font-size:14.5px;line-height:1.8">
+          <b>איך מעתיקים את הקוד:</b><br>1. פותחים את וואטסאפ (ההודעה מ"אביתר שוב משרד עו״ד")<br>2. לוחצים על <b>"העתקת קוד"</b><br>3. חוזרים לכאן – הקוד יודבק ויאומת לבד
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><a class="ghost" href="whatsapp://" style="text-decoration:none">💬 פתיחת וואטסאפ</a><button class="ghost" id="pasteBtn" type="button">📋 הדבקת הקוד</button></div>
+        </div>
         <input id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
         <button class="btn" id="verify">אימות</button>
         <div style="text-align:center;margin-top:10px"><button class="ghost" id="again">שליחת קוד חדש</button></div>
@@ -130,7 +134,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   function sendCode(btn, via) {
     VIA = via || VIA; busy(btn, true); say('');
     call('code', TOK, VIA).then(function (r) {
-      $('codeBox').hidden = false; $('sendBox').hidden = true;
+      $('codeBox').hidden = false; $('sendBox').hidden = true; $('waHelp').hidden = r.via !== 'wa';
       $('sentTo').textContent = r.via === 'wa' ? 'שלחנו קוד בן 6 ספרות בוואטסאפ ל-' + r.to + '.' :
         (r.note ? 'לא הצלחנו לשלוח בוואטסאפ כרגע, אז שלחנו קוד בן 6 ספרות למייל ' + r.mail + '. כדאי לבדוק גם בדואר הזבל.' : 'שלחנו קוד בן 6 ספרות ל-' + r.mail + '. כדאי לבדוק גם בדואר הזבל.');
       $('code').focus();
@@ -139,6 +143,17 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   $('sendCode').onclick = function () { sendCode(this, 'mail'); };
   $('codeWa').onclick = function () { sendCode(this, 'wa'); };
   $('again').onclick = function () { sendCode(this); };
+  // הדבקה אוטומטית: כשחוזרים מוואטסאפ לעמוד מנסים לקרוא את הקוד מההעתקה (באייפון תופיע בועת "הדבק"), ויש גם כפתור
+  function tryPaste(manual) {
+    if ($('codeBox').hidden || $('code').value.length === 6 || !navigator.clipboard || !navigator.clipboard.readText) { if (manual) $('code').focus(); return; }
+    navigator.clipboard.readText().then(function (t) {
+      var m = String(t || '').match(/\b(\d{6})\b/);
+      if (m) { $('code').value = m[1]; $('code').oninput(); } else if (manual) { say('לא נמצא קוד בהעתקה – אפשר להקליד אותו', true); $('code').focus(); }
+    }).catch(function () { if (manual) $('code').focus(); });
+  }
+  $('pasteBtn').onclick = function () { tryPaste(true); };
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') setTimeout(function () { tryPaste(false); }, 300); });
+  window.addEventListener('focus', function () { setTimeout(function () { tryPaste(false); }, 300); });
   $('code').oninput = function () { say(''); this.value = this.value.replace(/\D/g, '').slice(0, 6); if (this.value.length === 6) $('verify').click(); };
   $('verify').onclick = function () {
     var btn = this, c = $('code').value; if (!/^\d{6}$/.test(c)) { say('צריך 6 ספרות', true); return; }
