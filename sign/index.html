@@ -181,7 +181,18 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     var g = E('a', 'כניסה לשירות "אימות דיגיטלי מקוון" באתר gov.il'); g.href = 'https://www.gov.il/he/service/online-authentication-adam'; g.target = '_blank'; g.rel = 'noopener';
     var l1 = E('div', '1. '); l1.appendChild(g); box.appendChild(l1);
     box.appendChild(E('div', '2. מזדהים בהזדהות הלאומית'));
-    box.appendChild(E('div', '3. ממלאים: ' + (r.lic ? 'מספר רישיון עו״ד ' + r.lic + ', ' : '') + 'מייל עורך הדין er@shoovlaw.com'));
+    box.appendChild(E('div', '3. ממלאים בטופס (לחיצה על "העתקה" ומדביקים):'));
+    var copy = function (label, val) {
+      var row = E('div', null, 'display:flex;align-items:center;gap:8px;margin:4px 0');
+      row.appendChild(E('span', label, 'min-width:120px;color:#576175'));
+      var v = E('input', null, 'flex:1;min-width:0;direction:ltr;text-align:left;font:500 16px Rubik,Arial,sans-serif;letter-spacing:0;padding:6px 10px;border:1px solid #d1d6e0;border-radius:8px;background:#fafbfc'); v.value = val; v.readOnly = true; row.appendChild(v);
+      var c = E('button', 'העתקה', 'border:1px solid #172a4f;background:#fff;color:#172a4f;border-radius:999px;padding:6px 14px;font:500 14px Rubik,Arial,sans-serif;cursor:pointer'); c.type = 'button';
+      c.onclick = function () { var ok = function () { c.textContent = '✓ הועתק'; setTimeout(function () { c.textContent = 'העתקה'; }, 2000); }; v.select(); v.setSelectionRange(0, 99);
+        try { navigator.clipboard.writeText(val).then(ok, function () { try { document.execCommand('copy'); ok(); } catch (e) {} }); } catch (e) { try { document.execCommand('copy'); ok(); } catch (x) {} } };
+      row.appendChild(c); box.appendChild(row);
+    };
+    if (r.lic) copy('מספר רישיון עו״ד', String(r.lic));
+    copy('מייל עורך הדין', 'er@shoovlaw.com');
     box.appendChild(E('div', 'החתימה תיפתח אחרי שעורך הדין יאשר את זהותך בפגישה.', 'margin-top:6px;color:#576175'));
   }
   function waitId() {
