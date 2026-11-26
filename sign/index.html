@@ -1,0 +1,206 @@
+<!doctype html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>חתימה על מסמך | שוב – חברת עורכי דין</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="https://shoov.co.il/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* חתימה על מסמך – doc.shoov.co.il/sign (26.11.26). צבעים וגופן כמו באתר shoov.co.il */
+:root{--navy:#172a4f;--ink:#0f1624;--mut:#576175;--line:#d1d6e0;--bg:#f6f7f9;--gold:#dfa620;--ok:#15803d;--bad:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font:16px/1.6 Rubik,Heebo,Arial,sans-serif;color:var(--ink)}
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+.brand{text-align:center;margin:4px 0 18px}
+.brand img{height:120px;width:auto;margin:-34px 0 -36px}
+.brand .ln{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;color:var(--mut);font-size:13px;letter-spacing:4px}
+.brand .ln:before,.brand .ln:after{content:"";width:36px;height:1px;background:var(--gold)}
+.card{background:#fff;border:1px solid #e6e9ef;border-radius:16px;padding:24px;box-shadow:0 8px 30px rgba(15,22,36,.06)}
+h1{font-size:22px;font-weight:700;margin:0 0 4px;color:var(--navy)}
+.lead{color:var(--mut);margin:0 0 16px;font-size:15px;font-weight:300}
+.doc{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+.doc b{font-weight:500}
+input{width:100%;font:inherit;font-size:22px;letter-spacing:8px;text-align:center;border:1px solid var(--line);border-radius:12px;padding:12px;outline:none;direction:ltr}
+input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
+.btn{width:100%;margin-top:16px;background:var(--navy);color:#fff;border:0;border-radius:9999px;padding:14px;font:500 17px Rubik,Arial,sans-serif;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:default}
+.ghost{background:none;border:1px solid var(--line);color:var(--navy);border-radius:9999px;padding:9px 16px;font:inherit;font-size:14px;cursor:pointer}
+.msg{margin-top:10px;font-weight:500;text-align:center;min-height:24px}.msg.bad{color:var(--bad)}
+.pages{border:1px solid var(--line);border-radius:12px;max-height:60vh;overflow:auto;background:#eef0f3;padding:10px;margin:12px 0}
+.pages canvas{display:block;width:100%;height:auto;margin:0 auto 10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:15px;margin:10px 0}
+.agree input{width:auto;margin-top:5px}
+.pad{width:100%;height:170px;border:1.5px dashed #b8bfcc;border-radius:12px;background:#fafbfc;touch-action:none;display:block}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:6px;color:var(--mut);font-size:13px}
+.ok{background:#ecfdf3;color:var(--ok);border-radius:12px;padding:14px;font-weight:500;text-align:center}
+.note{color:var(--mut);font-size:12.5px;margin-top:14px;text-align:center;font-weight:300}
+.foot{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px;font-weight:300}
+[hidden]{display:none!important}
+@media(max-width:560px){.card{padding:18px 14px}.brand img{height:98px;margin:-28px 0 -30px}h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><img src="https://shoov.co.il/assets/logo-shoov-adYTg36Z.png" alt="SHOOV Law Firm"><div class="ln">חברת עורכי דין</div></div>
+  <div class="card">
+    <div id="s0"><h1>רגע…</h1><p class="lead">טוענים את המסמך</p></div>
+
+    <div id="s1" hidden>
+      <h1 id="hi">מסמך לחתימה</h1>
+      <p class="lead">לפני הצפייה נאמת את זהותך בקוד חד-פעמי שנשלח למייל שרשום אצלנו.</p>
+      <div class="doc"><b id="title"></b><div class="note" style="text-align:right;margin:2px 0 0" id="exp"></div></div>
+      <button class="btn" id="sendCode">שלחו לי קוד למייל</button>
+      <div id="codeBox" hidden>
+        <p class="lead" style="margin:14px 0 8px" id="sentTo"></p>
+        <input id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
+        <button class="btn" id="verify">אימות</button>
+        <div style="text-align:center;margin-top:10px"><button class="ghost" id="again">שליחת קוד חדש</button></div>
+      </div>
+    </div>
+
+    <div id="s2" hidden>
+      <h1>קריאת המסמך</h1>
+      <p class="lead" id="t2"></p>
+      <div class="pages" id="pages"></div>
+      <label class="agree"><input type="checkbox" id="agree"> קראתי את המסמך ואני מסכים/ה לחתום עליו באופן אלקטרוני</label>
+      <div style="font-weight:500;margin-top:14px">חתימה</div>
+      <canvas class="pad" id="pad"></canvas>
+      <div class="row"><span>חותמים באצבע או בעכבר בתוך המסגרת</span><button class="ghost" id="clear">ניקוי</button></div>
+      <button class="btn" id="sign">חתימה ושליחה למשרד</button>
+    </div>
+
+    <div id="s3" hidden>
+      <h1>המסמך נחתם</h1>
+      <div class="ok" id="okt">המסמך נחתם ונשלח למשרד. תודה!</div>
+      <div style="text-align:center;margin-top:14px"><a class="ghost" id="dl" download="מסמך חתום.pdf" style="text-decoration:none;display:inline-block">הורדת עותק חתום</a></div>
+    </div>
+
+    <div class="msg" id="msg"></div>
+  </div>
+  <div class="foot">אביתר שוב – חברת עורכי דין · החתימה מתועדת: קוד אימות, מועד וטביעת אצבע דיגיטלית של המסמך</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script>
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbzq9LfZRg0xY6lB8qs7M3tFSL1rHGMBAJpeN38D3gSGVY4zenzYlvGvDe4OeYRpN9Hw/exec';
+  var TOK = (location.hash || '').replace(/^#/, '').trim();
+  try { if (TOK) sessionStorage.setItem('sgt', TOK); else TOK = sessionStorage.getItem('sgt') || ''; } catch (e) {} // רענון הדף לא מאבד את הקישור
+  var SESS = '', INFO = {}, ORIG = null, H0 = '', REF = '';
+  var $ = function (id) { return document.getElementById(id); };
+  var show = function (n) { ['s0', 's1', 's2', 's3'].forEach(function (s) { $(s).hidden = s !== n; }); };
+  var say = function (t, bad) { $('msg').textContent = t || ''; $('msg').className = 'msg' + (bad ? ' bad' : ''); };
+  function call(fn, a, b, c) {
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, a: a, b: b, c: c }) })
+      .then(function (r) { return r.json(); }).then(function (j) { if (!j.ok) throw new Error(j.err || 'שגיאה'); return j.r; });
+  }
+  function busy(btn, on, t) { btn.disabled = on; if (t) btn.textContent = t; }
+  function b64ToBytes(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+  function bytesToB64(u) { var s = '', ch = 0x8000; for (var i = 0; i < u.length; i += ch) s += String.fromCharCode.apply(null, u.subarray(i, i + ch)); return btoa(s); }
+  function fmt(d) { var z = function (n) { return ('0' + n).slice(-2); }; return z(d.getDate()) + '.' + z(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()); }
+
+  if (!/^[a-f0-9]{64}$/.test(TOK)) { $('s0').innerHTML = '<h1>הקישור אינו תקין</h1><p class="lead">כדאי לפתוח שוב את הקישור מההודעה שקיבלת מהמשרד.</p>'; return; }
+  history.replaceState(null, '', location.pathname); // הקישור הסודי לא נשאר בשורת הכתובת
+
+  call('open', TOK, navigator.userAgent).then(function (r) {
+    INFO = r;
+    if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; $('dl').hidden = true; return; }
+    $('hi').textContent = (r.name ? 'שלום ' + r.name + ', ' : '') + 'מסמך לחתימה';
+    $('title').textContent = r.title; $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
+    show('s1');
+  }).catch(function (e) { $('s0').innerHTML = '<h1>לא ניתן לפתוח</h1><p class="lead"></p>'; $('s0').querySelector('p').textContent = e.message; });
+
+  function sendCode(btn) {
+    busy(btn, true); say('');
+    call('code', TOK).then(function (r) { $('codeBox').hidden = false; $('sendCode').hidden = true; $('sentTo').textContent = 'שלחנו קוד בן 6 ספרות ל-' + r.mail + '. כדאי לבדוק גם בדואר הזבל.'; $('code').focus(); })
+      .catch(function (e) { say(e.message, true); }).then(function () { busy(btn, false); });
+  }
+  $('sendCode').onclick = function () { sendCode(this); };
+  $('again').onclick = function () { sendCode(this); };
+  $('code').oninput = function () { say(''); this.value = this.value.replace(/\D/g, '').slice(0, 6); if (this.value.length === 6) $('verify').click(); };
+  $('verify').onclick = function () {
+    var btn = this, c = $('code').value; if (!/^\d{6}$/.test(c)) { say('צריך 6 ספרות', true); return; }
+    busy(btn, true, 'מאמתים…');
+    call('verify', TOK, c).then(function (r) { SESS = r.sess; return call('pdf', TOK, SESS); }).then(function (r) {
+      H0 = r.h0; REF = r.ref; ORIG = b64ToBytes(r.data); $('t2').textContent = INFO.title; show('s2'); say(''); setupPad(); return render(ORIG);
+    }).catch(function (e) { say(e.message, true); }).then(function () { busy(btn, false, 'אימות'); });
+  };
+
+  function render(bytes) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    return pdfjsLib.getDocument({ data: bytes.slice() }).promise.then(function (pdf) {
+      var box = $('pages'); box.innerHTML = ''; var chain = Promise.resolve();
+      for (var i = 1; i <= pdf.numPages; i++) (function (n) {
+        chain = chain.then(function () { return pdf.getPage(n); }).then(function (pg) {
+          var vp = pg.getViewport({ scale: 1.6 }); var cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height; box.appendChild(cv);
+          return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+        });
+      })(i);
+      return chain;
+    });
+  }
+
+  var drawn = false;
+  function setupPad() {
+    var c = $('pad'), x; var fit = function () { var r = c.getBoundingClientRect(); c.width = r.width * 2; c.height = r.height * 2; x = c.getContext('2d'); x.lineWidth = 5; x.lineCap = 'round'; x.lineJoin = 'round'; x.strokeStyle = '#0f1624'; drawn = false; };
+    fit(); var d = false;
+    var p = function (e) { var r = c.getBoundingClientRect(); return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height]; };
+    c.onpointerdown = function (e) { d = true; c.setPointerCapture(e.pointerId); var q = p(e); x.beginPath(); x.moveTo(q[0], q[1]); };
+    c.onpointermove = function (e) { if (!d) return; var q = p(e); x.lineTo(q[0], q[1]); x.stroke(); drawn = true; say(''); };
+    c.onpointerup = c.onpointercancel = function () { d = false; };
+    $('clear').onclick = fit;
+  }
+
+  // דף חתימה (תמונה) – עברית מצוירת בדפדפן, בלי תלות בגופנים בתוך ה-PDF
+  function signPage(when) {
+    var W = 1240, H = 1754, cv = document.createElement('canvas'); cv.width = W; cv.height = H; var g = cv.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.direction = 'rtl'; g.textAlign = 'right'; g.fillStyle = '#172a4f';
+    var y = 150, R = W - 110, line = function (t, size, w, col) { g.font = (w || 400) + ' ' + size + 'px Rubik, Arial, sans-serif'; g.fillStyle = col || '#0f1624'; g.fillText(t, R, y); y += size * 1.7; };
+    line('אביתר שוב – חברת עורכי דין', 30, 500, '#576175');
+    line('דף חתימה אלקטרונית', 52, 700, '#172a4f'); y += 10;
+    g.fillStyle = '#dfa620'; g.fillRect(110, y - 30, W - 220, 3); y += 30;
+    line('מסמך: ' + INFO.title, 32); line('החותם: ' + (INFO.name || ''), 32); line('מועד החתימה: ' + when, 32);
+    line('אימות: קוד חד-פעמי שנשלח ל-' + (INFO.mail || 'מייל שבתיק'), 32); line('מזהה בקשה: ' + REF, 32);
+    line('טביעת אצבע של המסמך המקורי (SHA-256):', 26, 400, '#576175');
+    g.direction = 'ltr'; g.textAlign = 'right'; line(H0.slice(0, 32), 24, 400, '#576175'); line(H0.slice(32), 24, 400, '#576175'); g.direction = 'rtl';
+    y += 20; line('חתימה:', 32, 500);
+    var pad = $('pad'); var sw = 640, sh = sw * pad.height / pad.width;
+    g.strokeStyle = '#d1d6e0'; g.lineWidth = 2; g.strokeRect(R - sw, y - 20, sw, sh + 20); g.drawImage(pad, R - sw, y - 10, sw, sh);
+    y += sh + 70;
+    g.font = '400 24px Rubik, Arial, sans-serif'; g.fillStyle = '#576175';
+    ['החותם אימת את זהותו בקוד חד-פעמי, צפה במסמך, אישר שקרא אותו והסכים לחתום עליו באופן אלקטרוני.', 'דף תיעוד מלא נשמר במשרד. כל שינוי בקובץ אחרי החתימה ישנה את טביעת האצבע שלו.'].forEach(function (t) { g.fillText(t, R, y); y += 40; });
+    return cv;
+  }
+  function footer(when) {
+    var cv = document.createElement('canvas'); cv.width = 1400; cv.height = 40; var g = cv.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, 1400, 40); g.direction = 'rtl'; g.textAlign = 'center'; g.fillStyle = '#576175'; g.font = '400 24px Rubik, Arial, sans-serif';
+    g.fillText('נחתם אלקטרונית · ' + (INFO.name || '') + ' · ' + when + ' · מזהה ' + REF + ' · אביתר שוב – חברת עורכי דין', 700, 28); return cv;
+  }
+  function png(cv) { return b64ToBytes(cv.toDataURL('image/png').split(',')[1]); }
+
+  $('sign').onclick = function () {
+    var btn = this;
+    if (!$('agree').checked) { say('צריך לסמן שקראת את המסמך', true); return; }
+    if (!drawn) { say('צריך לחתום בתוך המסגרת', true); return; }
+    busy(btn, true, 'חותמים…'); say('');
+    var when = fmt(new Date()), out;
+    PDFLib.PDFDocument.load(ORIG, { ignoreEncryption: true }).then(function (doc) {
+      return Promise.all([doc.embedPng(png(footer(when))), doc.embedPng(png(signPage(when)))]).then(function (im) {
+        doc.getPages().forEach(function (pg) { var s = pg.getSize(), w = Math.min(s.width - 40, 420), h = w * 40 / 1400; pg.drawImage(im[0], { x: (s.width - w) / 2, y: 4, width: w, height: h }); });
+        var last = doc.addPage([595.28, 841.89]); last.drawImage(im[1], { x: 0, y: 0, width: 595.28, height: 841.89 });
+        doc.setModificationDate(new Date()); return doc.save();
+      });
+    }).then(function (bytes) { out = bytes; return call('done', TOK, SESS, { data: bytesToB64(bytes), ua: navigator.userAgent, tzo: new Date().getTimezoneOffset() }); })
+      .then(function () {
+        show('s3'); $('okt').textContent = 'המסמך "' + INFO.title + '" נחתם ונשלח למשרד. תודה!';
+        $('dl').href = URL.createObjectURL(new Blob([out], { type: 'application/pdf' })); $('dl').download = INFO.title + ' – חתום.pdf'; say('');
+      }).catch(function (e) { say(e.message || 'החתימה לא נשמרה – אפשר לנסות שוב', true); busy(btn, false, 'חתימה ושליחה למשרד'); });
+  };
+})();
+</script>
+</body>
+</html>
