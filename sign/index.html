@@ -65,8 +65,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
       <div id="codeBox" hidden>
         <p class="lead" style="margin:14px 0 8px" id="sentTo"></p>
         <div id="waHelp" class="doc" hidden style="font-size:14.5px;line-height:1.8">
-          <b>איך מעתיקים את הקוד:</b><br>1. פותחים את וואטסאפ (ההודעה מ"אביתר שוב משרד עו״ד")<br>2. לוחצים על <b>"העתקת קוד"</b><br>3. חוזרים לכאן – הקוד יודבק ויאומת לבד
-          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><a class="ghost" href="whatsapp://" style="text-decoration:none">💬 פתיחת וואטסאפ</a><button class="ghost" id="pasteBtn" type="button">📋 הדבקת הקוד</button></div>
+          <b>איך מכניסים את הקוד:</b><br>1. חוזרים לשיחה בוואטסאפ עם "אביתר שוב משרד עו״ד"<br>2. לוחצים על <b>"העתקת קוד"</b><br>3. פותחים שוב את הקישור ומדביקים את הקוד בשדה
         </div>
         <input id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
         <button class="btn" id="verify">אימות</button>
@@ -126,7 +125,8 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; $('dl').hidden = true; return; }
     $('hi').textContent = (r.name ? 'שלום ' + r.name + ', ' : '') + 'מסמך לחתימה';
     if (r.wa) $('codeWa').hidden = false;
-    $('title').textContent = r.title; $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
+    $('title').textContent = r.title;
+    if (r.otpPending) { $('codeBox').hidden = false; $('sendBox').hidden = true; $('waHelp').hidden = r.otpVia !== 'wa'; $('sentTo').textContent = 'כבר שלחנו לך קוד בן 6 ספרות' + (r.otpVia === 'wa' ? ' בוואטסאפ' : ' במייל') + '. מדביקים אותו כאן:'; } $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
     show('s1');
   }).catch(function (e) { $('s0').innerHTML = '<h1>לא ניתן לפתוח</h1><p class="lead"></p>'; $('s0').querySelector('p').textContent = e.message; });
 
@@ -151,7 +151,6 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
       if (m) { $('code').value = m[1]; $('code').oninput(); } else if (manual) { say('לא נמצא קוד בהעתקה – אפשר להקליד אותו', true); $('code').focus(); }
     }).catch(function () { if (manual) $('code').focus(); });
   }
-  $('pasteBtn').onclick = function () { tryPaste(true); };
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') setTimeout(function () { tryPaste(false); }, 300); });
   window.addEventListener('focus', function () { setTimeout(function () { tryPaste(false); }, 300); });
   $('code').oninput = function () { say(''); this.value = this.value.replace(/\D/g, '').slice(0, 6); if (this.value.length === 6) $('verify').click(); };
