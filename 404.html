@@ -11,6 +11,8 @@
 (function () {
   var m = location.pathname.match(/^\/sign\/([a-f0-9]{64})\/?$/);
   if (m) location.replace('/sign/#' + m[1]);
+  var k = location.pathname.match(/^\/s\/([a-z0-9]{10})\/?$/); // קישור קצר: doc.shoov.co.il/s/<קוד>
+  if (k) location.replace('/sign/#' + k[1]);
 })();
 </script>
 <style>body{margin:0;background:#f6f7f9;font:16px/1.6 Arial,sans-serif;color:#0f1624;text-align:center;padding:60px 16px}a{color:#172a4f}</style>
