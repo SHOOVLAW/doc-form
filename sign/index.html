@@ -38,6 +38,15 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 .ok{background:#ecfdf3;color:var(--ok);border-radius:12px;padding:14px;font-weight:500;text-align:center}
 .note{color:var(--mut);font-size:12.5px;margin-top:14px;text-align:center;font-weight:300}
 .foot{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px;font-weight:300}
+.fsb{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:12px;background:#fff;border:1px solid var(--navy);color:var(--navy);border-radius:9999px;padding:11px;font:500 15px Rubik,Arial,sans-serif;cursor:pointer}
+.pages canvas{cursor:zoom-in}
+#fs{position:fixed;inset:0;z-index:50;background:#2b2f36;display:flex;flex-direction:column}
+#fs .bar{display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top));background:#172a4f;color:#fff}
+#fs .bar button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px;min-width:44px;height:40px;font:500 18px Rubik,Arial,sans-serif;cursor:pointer;padding:0 12px}
+#fs .bar .z{min-width:56px;text-align:center;font-size:14px}
+#fs .bar .sp{flex:1}
+#fs .sc{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px}
+#fs .sc canvas{display:block;margin:0 auto 12px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35);max-width:none}
 [hidden]{display:none!important}
 @media(max-width:560px){.card{padding:18px 14px}.brand img{height:98px;margin:-28px 0 -30px}h1{font-size:20px}}
 </style>
@@ -64,6 +73,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     <div id="s2" hidden>
       <h1>קריאת המסמך</h1>
       <p class="lead" id="t2"></p>
+      <button class="fsb" id="fsOpen" type="button">🔍 פתיחת המסמך במסך מלא (אפשר להגדיל)</button>
       <div class="pages" id="pages"></div>
       <label class="agree"><input type="checkbox" id="agree"> קראתי את המסמך ואני מסכים/ה לחתום עליו באופן אלקטרוני</label>
       <div style="font-weight:500;margin-top:14px">חתימה</div>
@@ -80,6 +90,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 
     <div class="msg" id="msg"></div>
   </div>
+  <div id="fs" hidden><div class="bar"><button id="fsClose" type="button">✕ סגירה</button><span class="sp"></span><button id="zOut" type="button" aria-label="הקטנה">−</button><span class="z" id="zv">100%</span><button id="zIn" type="button" aria-label="הגדלה">+</button></div><div class="sc" id="fsPages"></div></div>
   <div class="foot">אביתר שוב – חברת עורכי דין · החתימה מתועדת: קוד אימות, מועד וטביעת אצבע דיגיטלית של המסמך</div>
 </div>
 
@@ -143,6 +154,29 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
       return chain;
     });
   }
+
+  // מסך מלא עם הגדלה (26.11.26): הדפים מצוירים פעם אחת ברזולוציה גבוהה, ההגדלה משנה רק את הרוחב
+  var FS = { z: 1, done: false };
+  function fsSize() { var w = Math.min($('fsPages').clientWidth - 24, 900) * FS.z; [].forEach.call($('fsPages').children, function (c) { c.style.width = w + 'px'; }); $('zv').textContent = Math.round(FS.z * 100) + '%'; }
+  function fsOpen() {
+    $('fs').hidden = false; document.body.style.overflow = 'hidden'; fsSize();
+    if (FS.done || !ORIG) return; FS.done = true;
+    pdfjsLib.getDocument({ data: ORIG.slice() }).promise.then(function (pdf) {
+      var chain = Promise.resolve();
+      for (var i = 1; i <= pdf.numPages; i++) (function (n) {
+        chain = chain.then(function () { return pdf.getPage(n); }).then(function (pg) {
+          var vp = pg.getViewport({ scale: 2.6 }); var cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height; $('fsPages').appendChild(cv); fsSize();
+          return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+        });
+      })(i);
+    });
+  }
+  function fsClose() { $('fs').hidden = true; document.body.style.overflow = ''; }
+  $('fsOpen').onclick = fsOpen; $('pages').onclick = fsOpen; $('fsClose').onclick = fsClose;
+  $('zIn').onclick = function () { FS.z = Math.min(3, FS.z + 0.25); fsSize(); };
+  $('zOut').onclick = function () { FS.z = Math.max(0.75, FS.z - 0.25); fsSize(); };
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('fs').hidden) fsClose(); });
+  window.addEventListener('resize', function () { if (!$('fs').hidden) fsSize(); });
 
   var drawn = false;
   function setupPad() {
