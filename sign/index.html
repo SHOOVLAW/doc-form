@@ -88,7 +88,6 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     <div id="s3" hidden>
       <h1>המסמך נחתם</h1>
       <div class="ok" id="okt">המסמך נחתם ונשלח למשרד. תודה!</div>
-      <div style="text-align:center;margin-top:14px"><a class="ghost" id="dl" download="מסמך חתום.pdf" style="text-decoration:none;display:inline-block">הורדת עותק חתום</a></div>
     </div>
 
     <div class="msg" id="msg"></div>
@@ -122,7 +121,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 
   call('open', TOK, navigator.userAgent).then(function (r) {
     INFO = r;
-    if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; $('dl').hidden = true; return; }
+    if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; return; }
     $('hi').textContent = (r.name ? 'שלום ' + r.name + ', ' : '') + 'מסמך לחתימה';
     if (r.wa) $('codeWa').hidden = false;
     $('title').textContent = r.title;
@@ -252,7 +251,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     }).then(function (bytes) { out = bytes; return call('done', TOK, SESS, { data: bytesToB64(bytes), ua: navigator.userAgent, tzo: new Date().getTimezoneOffset() }); })
       .then(function () {
         show('s3'); $('okt').textContent = 'המסמך "' + INFO.title + '" נחתם ונשלח למשרד. תודה!';
-        $('dl').href = URL.createObjectURL(new Blob([out], { type: 'application/pdf' })); $('dl').download = INFO.title + ' – חתום.pdf'; say('');
+        say('');
       }).catch(function (e) { say(e.message || 'החתימה לא נשמרה – אפשר לנסות שוב', true); busy(btn, false, 'חתימה ושליחה למשרד'); });
   };
 })();
