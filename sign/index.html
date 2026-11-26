@@ -59,9 +59,9 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 
     <div id="s1" hidden>
       <h1 id="hi">מסמך לחתימה</h1>
-      <p class="lead">לפני הצפייה נאמת את זהותך בקוד חד-פעמי שנשלח למייל שרשום אצלנו.</p>
+      <p class="lead">לפני הצפייה נאמת את זהותך בקוד חד-פעמי שנשלח לפרטים שרשומים אצלנו.</p>
       <div class="doc"><b id="title"></b><div class="note" style="text-align:right;margin:2px 0 0" id="exp"></div></div>
-      <button class="btn" id="sendCode">שלחו לי קוד למייל</button>
+      <div id="sendBox"><button class="btn" id="codeWa" hidden>💬 שלחו לי קוד בוואטסאפ</button><button class="btn" id="sendCode">📧 שלחו לי קוד למייל</button></div>
       <div id="codeBox" hidden>
         <p class="lead" style="margin:14px 0 8px" id="sentTo"></p>
         <input id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
@@ -121,16 +121,23 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     INFO = r;
     if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; $('dl').hidden = true; return; }
     $('hi').textContent = (r.name ? 'שלום ' + r.name + ', ' : '') + 'מסמך לחתימה';
+    if (r.wa) $('codeWa').hidden = false;
     $('title').textContent = r.title; $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
     show('s1');
   }).catch(function (e) { $('s0').innerHTML = '<h1>לא ניתן לפתוח</h1><p class="lead"></p>'; $('s0').querySelector('p').textContent = e.message; });
 
-  function sendCode(btn) {
-    busy(btn, true); say('');
-    call('code', TOK).then(function (r) { $('codeBox').hidden = false; $('sendCode').hidden = true; $('sentTo').textContent = 'שלחנו קוד בן 6 ספרות ל-' + r.mail + '. כדאי לבדוק גם בדואר הזבל.'; $('code').focus(); })
-      .catch(function (e) { say(e.message, true); }).then(function () { busy(btn, false); });
+  var VIA = 'mail';
+  function sendCode(btn, via) {
+    VIA = via || VIA; busy(btn, true); say('');
+    call('code', TOK, VIA).then(function (r) {
+      $('codeBox').hidden = false; $('sendBox').hidden = true;
+      $('sentTo').textContent = r.via === 'wa' ? 'שלחנו קוד בן 6 ספרות בוואטסאפ ל-' + r.to + '.' :
+        (r.note ? 'לא הצלחנו לשלוח בוואטסאפ כרגע, אז שלחנו קוד בן 6 ספרות למייל ' + r.mail + '. כדאי לבדוק גם בדואר הזבל.' : 'שלחנו קוד בן 6 ספרות ל-' + r.mail + '. כדאי לבדוק גם בדואר הזבל.');
+      $('code').focus();
+    }).catch(function (e) { say(e.message, true); }).then(function () { busy(btn, false); });
   }
-  $('sendCode').onclick = function () { sendCode(this); };
+  $('sendCode').onclick = function () { sendCode(this, 'mail'); };
+  $('codeWa').onclick = function () { sendCode(this, 'wa'); };
   $('again').onclick = function () { sendCode(this); };
   $('code').oninput = function () { say(''); this.value = this.value.replace(/\D/g, '').slice(0, 6); if (this.value.length === 6) $('verify').click(); };
   $('verify').onclick = function () {
