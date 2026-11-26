@@ -61,6 +61,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
       <h1 id="hi">מסמך לחתימה</h1>
       <p class="lead">לפני הצפייה נאמת את זהותך בקוד חד-פעמי שנשלח לפרטים שרשומים אצלנו.</p>
       <div class="doc"><b id="title"></b><div class="note" style="text-align:right;margin:2px 0 0" id="exp"></div></div>
+      <div id="meetBox" class="doc" hidden style="font-size:14.5px;line-height:1.8"></div>
       <div id="sendBox"><button class="btn" id="codeWa" hidden>💬 שלחו לי קוד בוואטסאפ</button><button class="btn" id="sendCode">📧 שלחו לי קוד למייל</button></div>
       <div id="codeBox" hidden>
         <p class="lead" style="margin:14px 0 8px" id="sentTo"></p>
@@ -71,6 +72,12 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
         <button class="btn" id="verify">אימות</button>
         <div style="text-align:center;margin-top:10px"><button class="ghost" id="again">שליחת קוד חדש</button></div>
       </div>
+    </div>
+
+    <div id="s4" hidden>
+      <h1>ממתינים לאישור עורך הדין</h1>
+      <p class="lead">הקוד אומת. המסמך ייפתח לחתימה מיד אחרי שעורך הדין יאשר את זהותך בפגישה – אין צורך לרענן.</p>
+      <div id="meetBox2"></div>
     </div>
 
     <div id="s2" hidden>
@@ -105,7 +112,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   try { if (TOK) sessionStorage.setItem('sgt', TOK); else TOK = sessionStorage.getItem('sgt') || ''; } catch (e) {} // רענון הדף לא מאבד את הקישור
   var SESS = '', INFO = {}, ORIG = null, H0 = '', REF = '';
   var $ = function (id) { return document.getElementById(id); };
-  var show = function (n) { ['s0', 's1', 's2', 's3'].forEach(function (s) { $(s).hidden = s !== n; }); };
+  var show = function (n) { ['s0', 's1', 's2', 's3', 's4'].forEach(function (s) { $(s).hidden = s !== n; }); };
   var say = function (t, bad) { $('msg').textContent = t || ''; $('msg').className = 'msg' + (bad ? ' bad' : ''); };
   function call(fn, a, b, c) {
     return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, a: a, b: b, c: c }) })
@@ -124,6 +131,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; return; }
     $('hi').textContent = (r.name ? 'שלום ' + r.name + ', ' : '') + 'מסמך לחתימה';
     if (r.wa) $('codeWa').hidden = false;
+    if (r.level === 'h') meetBox($('meetBox'), r, true);
     $('title').textContent = r.title;
     if (r.otpPending) { $('codeBox').hidden = false; $('sendBox').hidden = true; $('waHelp').hidden = r.otpVia !== 'wa'; $('sentTo').textContent = 'כבר שלחנו לך קוד בן 6 ספרות' + (r.otpVia === 'wa' ? ' בוואטסאפ' : ' במייל') + '. מדביקים אותו כאן:'; } $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
     show('s1');
@@ -156,10 +164,34 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   $('verify').onclick = function () {
     var btn = this, c = $('code').value; if (!/^\d{6}$/.test(c)) { say('צריך 6 ספרות', true); return; }
     busy(btn, true, 'מאמתים…');
-    call('verify', TOK, c).then(function (r) { SESS = r.sess; return call('pdf', TOK, SESS); }).then(function (r) {
+    call('verify', TOK, c).then(function (r) { SESS = r.sess; return INFO.level === 'h' && !INFO.idOk ? waitId() : null; }).then(function () { return call('pdf', TOK, SESS); }).then(function (r) {
       H0 = r.h0; REF = r.ref; ORIG = b64ToBytes(r.data); $('t2').textContent = INFO.title; show('s2'); say(''); setupPad(); return render(ORIG);
     }).catch(function (e) { say(e.message, true); }).then(function () { busy(btn, false, 'אימות'); });
   };
+
+  // חתימה חמורה / תצהיר: פרטי הפגישה, הוראות אד"מ, והמתנה לאישור עורך הדין
+  function meetBox(box, r, full) {
+    box.innerHTML = ''; box.hidden = false;
+    var E = function (t, x, st) { var e = document.createElement(t); if (x != null) e.textContent = x; if (st) e.style.cssText = st; return e; };
+    var d = r.meetAt ? new Date(r.meetAt) : null;
+    box.appendChild(E('b', '🎥 פגישת וידאו קצרה עם עו״ד אביתר שוב' + (d ? ': ' + fmt(d) : '')));
+    if (r.meet) { var a = E('a', 'הצטרפות לפגישה', 'display:inline-block;margin:6px 0 8px;background:#172a4f;color:#fff;text-decoration:none;padding:8px 18px;border-radius:999px;font-weight:500'); a.href = r.meet; a.target = '_blank'; a.rel = 'noopener'; box.appendChild(E('div')).appendChild(a); }
+    if (!full) return;
+    box.appendChild(E('div', 'לפני הפגישה – אימות זהות ממשלתי (אד״מ):', 'margin-top:6px;font-weight:500'));
+    var g = E('a', 'כניסה לשירות "אימות דיגיטלי מקוון" באתר gov.il'); g.href = 'https://www.gov.il/he/service/online-authentication-adam'; g.target = '_blank'; g.rel = 'noopener';
+    var l1 = E('div', '1. '); l1.appendChild(g); box.appendChild(l1);
+    box.appendChild(E('div', '2. מזדהים בהזדהות הלאומית'));
+    box.appendChild(E('div', '3. ממלאים: ' + (r.lic ? 'מספר רישיון עו״ד ' + r.lic + ', ' : '') + 'מייל עורך הדין er@shoovlaw.com'));
+    box.appendChild(E('div', 'החתימה תיפתח אחרי שעורך הדין יאשר את זהותך בפגישה.', 'margin-top:6px;color:#576175'));
+  }
+  function waitId() {
+    show('s4'); meetBox($('meetBox2'), INFO, false);
+    return new Promise(function (ok, bad) {
+      var t = setInterval(function () {
+        call('status', TOK, SESS).then(function (x) { if (x.idOk) { clearInterval(t); INFO.idOk = true; ok(); } }).catch(function (e) { if (!/ממתינים/.test(e.message)) { clearInterval(t); bad(e); } });
+      }, 6000);
+    });
+  }
 
   function render(bytes) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
