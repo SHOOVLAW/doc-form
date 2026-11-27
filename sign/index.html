@@ -41,6 +41,19 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 .foot{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px;font-weight:300}
 .fsb{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:12px;background:#fff;border:1px solid var(--navy);color:var(--navy);border-radius:9999px;padding:11px;font:500 15px Rubik,Arial,sans-serif;cursor:pointer}
 .pages canvas{cursor:zoom-in}
+/* מקומות חתימה במסמך (27.11.26) */
+.spw{position:relative;margin:0 auto 10px}.spw canvas{margin:0!important}
+.sbox{position:absolute;border:2.5px dashed #dfa620;background:rgba(223,166,32,.12);border-radius:6px;display:flex;align-items:center;justify-content:center;font:500 12px Rubik,Arial,sans-serif;color:#7a5600;box-sizing:border-box;text-align:center;line-height:1.2;padding:2px}
+.sbox.cur{border-style:solid;background:rgba(223,166,32,.28);cursor:pointer;animation:sgpl 1.2s infinite}
+.sbox.ok{border:1.5px solid #15803d;background:rgba(255,255,255,.9)}
+.sbox img{max-width:100%;max-height:100%}
+@keyframes sgpl{50%{box-shadow:0 0 0 7px rgba(223,166,32,.35)}}
+@media (prefers-reduced-motion:reduce){.sbox.cur{animation:none}}
+#pbar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 0 4px;margin-top:12px;z-index:5}
+#pbar .pt{font-weight:700;font-size:18px;color:var(--navy)}
+#pbar .ps{color:var(--mut);font-size:14px}
+#pbar .btn{margin-top:10px}
+.prog{display:flex;gap:4px;margin:8px 0 0}.prog i{flex:1;height:6px;border-radius:3px;background:#d1d6e0}.prog i.on{background:#dfa620}
 #fs{position:fixed;inset:0;z-index:50;background:#2b2f36;display:flex;flex-direction:column}
 #fs .bar{display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top));background:#172a4f;color:#fff}
 #fs .bar button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:10px;min-width:44px;height:40px;font:500 18px Rubik,Arial,sans-serif;cursor:pointer;padding:0 12px}
@@ -91,6 +104,11 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
       <canvas class="pad" id="pad"></canvas>
       <div class="row"><span>חותמים באצבע או בעכבר בתוך המסגרת</span><button class="ghost" id="clear">ניקוי</button></div>
       <button class="btn" id="sign">חתימה ושליחה למשרד</button>
+      <div id="pbar" hidden>
+        <div class="pt" id="pT"></div><div class="ps" id="pS"></div><div class="prog" id="pG"></div>
+        <button class="btn" id="pAll" type="button" style="background:#fff;color:var(--navy);border:1.5px solid var(--navy)">להוסיף את החתימה בכל המקומות שנשארו</button>
+        <button class="btn" id="pDone" type="button" disabled>סיום ושליחה למשרד</button>
+      </div>
     </div>
 
     <div id="s3" hidden>
@@ -142,9 +160,23 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     if (r.level === 'h') meetBox($('meetBox'), r, true);
     $('title').textContent = r.title;
     if (r.group && r.group.length > 1) { $('title').textContent = r.title + ' · חותם/ת ' + r.seq + ' מתוך ' + r.of; var gb = $('title').parentNode; gb.parentNode.insertBefore(grpList(r.group, r.seq), gb.nextSibling); }
+    if (r.level === 'l') { lightGo(); return; } // חתימה קלה: בלי קוד
     if (r.otpPending) { $('codeBox').hidden = false; $('sendBox').hidden = true; $('waHelp').hidden = r.otpVia !== 'wa'; $('sentTo').textContent = 'כבר שלחנו לך קוד בן 6 ספרות' + (r.otpVia === 'wa' ? ' בוואטסאפ' : ' במייל') + '. מדביקים אותו כאן:'; } $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
     show('s1');
   }).catch(function (e) { $('s0').innerHTML = '<h1>לא ניתן לפתוח</h1><p class="lead"></p>'; $('s0').querySelector('p').textContent = e.message; });
+
+  // חתימה קלה (27.11.26): הקישור האישי הוא האימות – ישר למסמך
+  function lightGo() {
+    show('s0'); $('s0').innerHTML = '<h1>רגע…</h1><p class="lead">פותחים את המסמך</p>';
+    call('light', TOK).then(function (r) { SESS = r.sess; return call('pdf', TOK, SESS); }).then(function (r) {
+      H0 = r.h0; REF = r.ref; ORIG = b64ToBytes(r.data); toDoc(); return render(ORIG);
+    }).catch(function (e) { $('s0').innerHTML = '<h1>לא ניתן לפתוח</h1><p class="lead"></p>'; $('s0').querySelector('p').textContent = e.message; });
+  }
+  function toDoc() {
+    $('t2').textContent = INFO.title + (INFO.of > 1 ? ' · חותם/ת ' + INFO.seq + ' מתוך ' + INFO.of : '');
+    if (INFO.group && INFO.group.length > 1 && !$('s2').querySelector('.grp')) $('t2').parentNode.insertBefore(grpList(INFO.group, INFO.seq), $('t2').nextSibling);
+    show('s2'); say(''); setupPad();
+  }
 
   var VIA = 'mail';
   function sendCode(btn, via) {
@@ -174,7 +206,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     var btn = this, c = $('code').value; if (!/^\d{6}$/.test(c)) { say('צריך 6 ספרות', true); return; }
     busy(btn, true, 'מאמתים…');
     call('verify', TOK, c).then(function (r) { SESS = r.sess; return INFO.level === 'h' && !INFO.idOk ? waitId() : null; }).then(function () { return call('pdf', TOK, SESS); }).then(function (r) {
-      H0 = r.h0; REF = r.ref; ORIG = b64ToBytes(r.data); $('t2').textContent = INFO.title; show('s2'); say(''); setupPad(); return render(ORIG);
+      H0 = r.h0; REF = r.ref; ORIG = b64ToBytes(r.data); toDoc(); return render(ORIG);
     }).catch(function (e) { say(e.message, true); }).then(function () { busy(btn, false, 'אימות'); });
   };
 
@@ -219,11 +251,12 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
       var box = $('pages'); box.innerHTML = ''; var chain = Promise.resolve();
       for (var i = 1; i <= pdf.numPages; i++) (function (n) {
         chain = chain.then(function () { return pdf.getPage(n); }).then(function (pg) {
-          var vp = pg.getViewport({ scale: 1.6 }); var cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height; box.appendChild(cv);
+          var vp = pg.getViewport({ scale: 1.6 }); var cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height;
+          var w = document.createElement('div'); w.className = 'spw'; w.appendChild(cv); box.appendChild(w);
           return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
         });
       })(i);
-      return chain;
+      return chain.then(function () { NP = pdf.numPages; MY = mySpots(NP); drawBoxes(); if (MY.length) $('sign').textContent = 'להמשיך – להוסיף את החתימה במסמך (' + MY.length + (MY.length > 1 ? ' מקומות)' : ' מקום)'); });
     });
   }
 
@@ -244,7 +277,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     });
   }
   function fsClose() { $('fs').hidden = true; document.body.style.overflow = ''; }
-  $('fsOpen').onclick = fsOpen; $('pages').onclick = fsOpen; $('fsClose').onclick = fsClose;
+  $('fsOpen').onclick = fsOpen; $('pages').onclick = function () { if (!PLACE) fsOpen(); }; $('fsClose').onclick = fsClose;
   $('zIn').onclick = function () { FS.z = Math.min(3, FS.z + 0.25); fsSize(); };
   $('zOut').onclick = function () { FS.z = Math.max(0.75, FS.z - 0.25); fsSize(); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('fs').hidden) fsClose(); });
@@ -270,7 +303,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     line('דף חתימה אלקטרונית', 52, 700, '#172a4f'); y += 10;
     g.fillStyle = '#dfa620'; g.fillRect(110, y - 30, W - 220, 3); y += 30;
     line('מסמך: ' + INFO.title, 32); line('החותם: ' + (INFO.name || '') + (INFO.of > 1 ? '  (חותם/ת ' + INFO.seq + ' מתוך ' + INFO.of + ')' : ''), 32); line('מועד החתימה: ' + when, 32);
-    line('אימות: קוד חד-פעמי שנשלח ל-' + (INFO.mail || 'מייל שבתיק'), 32); line('מזהה בקשה: ' + REF, 32);
+    line(INFO.level === 'l' ? 'אימות: קישור אישי שנשלח לחותם (חתימה קלה, בלי קוד)' : 'אימות: קוד חד-פעמי שנשלח ל-' + (INFO.mail || 'מייל שבתיק'), 32); line('מזהה בקשה: ' + REF, 32);
     line('טביעת אצבע של המסמך המקורי (SHA-256):', 26, 400, '#576175');
     g.direction = 'ltr'; g.textAlign = 'right'; line(H0.slice(0, 32), 24, 400, '#576175'); line(H0.slice(32), 24, 400, '#576175'); g.direction = 'rtl';
     y += 20; line('חתימה:', 32, 500);
@@ -278,7 +311,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     g.strokeStyle = '#d1d6e0'; g.lineWidth = 2; g.strokeRect(R - sw, y - 20, sw, sh + 20); g.drawImage(pad, R - sw, y - 10, sw, sh);
     y += sh + 70;
     g.font = '400 24px Rubik, Arial, sans-serif'; g.fillStyle = '#576175';
-    ['החותם אימת את זהותו בקוד חד-פעמי, צפה במסמך, אישר שקרא אותו והסכים לחתום עליו באופן אלקטרוני.', 'דף תיעוד מלא נשמר במשרד. כל שינוי בקובץ אחרי החתימה ישנה את טביעת האצבע שלו.'].forEach(function (t) { g.fillText(t, R, y); y += 40; });
+    [(INFO.level === 'l' ? 'החותם פתח קישור אישי' : 'החותם אימת את זהותו בקוד חד-פעמי') + ', צפה במסמך, אישר שקרא אותו והסכים לחתום עליו באופן אלקטרוני.', 'דף תיעוד מלא נשמר במשרד. כל שינוי בקובץ אחרי החתימה ישנה את טביעת האצבע שלו.'].forEach(function (t) { g.fillText(t, R, y); y += 40; });
     return cv;
   }
   function footer(when) {
@@ -288,14 +321,63 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   }
   function png(cv) { return b64ToBytes(cv.toDataURL('image/png').split(',')[1]); }
 
+  // ---------- מקומות חתימה (27.11.26): חותמים פעם אחת, ובכל מקום נוגעים והחתימה מועתקת ----------
+  var NP = 0, MY = [], PLACE = false, SIG = null;
+  function mySpots(n) {
+    var P = {}; try { P = JSON.parse(INFO.pos || '{}') || {}; } catch (e) {}
+    var me = Number(INFO.seq) || 1;
+    var a = (P.spots || []).filter(function (q) { return (Number(q.s) || 1) === me && Number(q.p) >= 1 && Number(q.p) <= n; }).map(function (q) { return { p: Number(q.p), x: +q.x, y: +q.y, w: +q.w || 0.25, h: +q.h || 0.06 }; });
+    if (P.every) for (var p = 1; p <= n; p++) a.push({ p: p, x: 0.04 + (me - 1) * 0.23, y: 0.895, w: 0.21, h: 0.05, every: true });
+    return a.sort(function (u, v) { return u.p - v.p || u.y - v.y; });
+  }
+  function drawBoxes() {
+    var ws = $('pages').querySelectorAll('.spw');
+    MY.forEach(function (q, i) {
+      var w = ws[q.p - 1]; if (!w) return; var b = document.createElement('div'); b.className = 'sbox'; b.dataset.i = i;
+      b.style.cssText = 'left:' + (q.x * 100) + '%;top:' + (q.y * 100) + '%;width:' + (q.w * 100) + '%;height:' + (q.h * 100) + '%';
+      b.textContent = 'החתימה שלך כאן'; q.el = b;
+      b.onclick = function (e) { e.stopPropagation(); if (PLACE && !q.ok) fill(i); };
+      w.appendChild(b);
+    });
+  }
+  function trimPad() {
+    var c = $('pad'), g = c.getContext('2d'), d = g.getImageData(0, 0, c.width, c.height).data, x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+    for (var y = 0; y < c.height; y += 2) for (var x = 0; x < c.width; x += 2) if (d[(y * c.width + x) * 4 + 3] > 20) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 <= x0) return c; var m = 8; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(c.width, x1 + m); y1 = Math.min(c.height, y1 + m);
+    var o = document.createElement('canvas'); o.width = x1 - x0; o.height = y1 - y0; o.getContext('2d').drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height); return o;
+  }
+  function nextI() { for (var i = 0; i < MY.length; i++) if (!MY[i].ok) return i; return -1; }
+  function bar() {
+    var k = MY.filter(function (q) { return q.ok; }).length, n = nextI();
+    MY.forEach(function (q, i) { q.el.className = 'sbox' + (q.ok ? ' ok' : i === n ? ' cur' : ''); if (!q.ok) q.el.textContent = i === n ? '👆 גע כאן להוספת החתימה' : 'החתימה שלך כאן'; });
+    $('pT').textContent = n < 0 ? '✓ החתימה נוספה בכל ' + MY.length + ' המקומות' : 'חתימה ' + (n + 1) + ' מתוך ' + MY.length;
+    $('pS').textContent = n < 0 ? 'עכשיו לוחצים "סיום ושליחה למשרד".' : 'עמוד ' + MY[n].p + (MY[n].every ? ' · תחתית העמוד' : '') + ' · נוגעים במסגרת הצהובה והחתימה שלך תועתק אליה';
+    var G = $('pG'); G.innerHTML = ''; MY.forEach(function (q) { var e = document.createElement('i'); if (q.ok) e.className = 'on'; G.appendChild(e); });
+    $('pAll').hidden = n < 0 || MY.length - k < 2; $('pDone').disabled = n >= 0;
+    if (n >= 0) MY[n].el.scrollIntoView({ behavior: 'smooth', block: 'center' }); else $('pDone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function fill(i) { var q = MY[i]; q.ok = true; q.el.textContent = ''; var im = document.createElement('img'); im.src = SIG.toDataURL('image/png'); im.alt = 'החתימה שלך'; q.el.appendChild(im); bar(); }
+  function startPlace() {
+    PLACE = true; SIG = trimPad(); $('sign').hidden = true; $('pbar').hidden = false; $('pad').style.pointerEvents = 'none'; $('clear').disabled = true; say(''); bar();
+  }
+  $('pAll').onclick = function () { MY.forEach(function (q, i) { if (!q.ok) fill(i); }); };
+  $('pDone').onclick = function () { finish(this); };
+
   $('sign').onclick = function () {
-    var btn = this;
     if (!$('agree').checked) { say('צריך לסמן שקראת את המסמך', true); return; }
     if (!drawn) { say('צריך לחתום בתוך המסגרת', true); return; }
+    if (MY.length && !PLACE) { startPlace(); return; }
+    finish(this);
+  };
+  function finish(btn) {
+    if (MY.length && nextI() >= 0) { say('צריך להוסיף את החתימה בכל המקומות', true); return; }
     busy(btn, true, 'חותמים…'); say('');
     var when = fmt(new Date()), out;
     PDFLib.PDFDocument.load(ORIG, { ignoreEncryption: true }).then(function (doc) {
-      return Promise.all([doc.embedPng(png(footer(when))), doc.embedPng(png(signPage(when)))]).then(function (im) {
+      return Promise.all([doc.embedPng(png(footer(when))), doc.embedPng(png(signPage(when))), MY.length ? doc.embedPng(png(SIG || trimPad())) : null]).then(function (im) {
+        var pgs = doc.getPages();
+        if (im[2]) MY.forEach(function (q) { var pg = pgs[q.p - 1]; if (!pg) return; var s = pg.getSize(), bw = q.w * s.width, bh = q.h * s.height, r = im[2].width / im[2].height, dw = bw, dh = bw / r; if (dh > bh) { dh = bh; dw = bh * r; }
+          pg.drawImage(im[2], { x: q.x * s.width + (bw - dw) / 2, y: s.height - (q.y + q.h) * s.height + (bh - dh) / 2, width: dw, height: dh }); });
         doc.getPages().forEach(function (pg) { var s = pg.getSize(), w = Math.min(s.width - 40, 420), h = w * 40 / 1400; pg.drawImage(im[0], { x: (s.width - w) / 2, y: 4 + Math.max(0, (INFO.seq || 1) - 1) * (h + 2), width: w, height: h }); });
         var last = doc.addPage([595.28, 841.89]); last.drawImage(im[1], { x: 0, y: 0, width: 595.28, height: 841.89 });
         doc.setModificationDate(new Date()); return doc.save();
@@ -305,8 +387,8 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
         show('s3'); $('okt').textContent = 'המסמך "' + INFO.title + '" נחתם ונשלח למשרד. תודה!';
         if (d && d.group && d.group.length > 1) { $('okt').textContent = d.next ? 'חתמת ✓ – המסמך הועבר כעת לחתימת ' + d.next.name : 'חתמת ✓ – כל החותמים חתמו. המסמך החתום נשלח למשרד.'; $('okt').parentNode.insertBefore(grpList(d.group, INFO.seq), $('okt').nextSibling); }
         say('');
-      }).catch(function (e) { say(e.message || 'החתימה לא נשמרה – אפשר לנסות שוב', true); busy(btn, false, 'חתימה ושליחה למשרד'); });
-  };
+      }).catch(function (e) { say(e.message || 'החתימה לא נשמרה – אפשר לנסות שוב', true); busy(btn, false, PLACE ? 'סיום ושליחה למשרד' : 'חתימה ושליחה למשרד'); });
+  }
 })();
 </script>
 </body>
