@@ -73,7 +73,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
         <div id="waHelp" class="doc" hidden style="font-size:14.5px;line-height:1.8">
           <b>איך מכניסים את הקוד:</b><br>1. חוזרים לשיחה בוואטסאפ עם "אביתר שוב משרד עו״ד"<br>2. לוחצים על <b>"העתקת קוד"</b><br>3. פותחים שוב את הקישור ומדביקים את הקוד בשדה
         </div>
-        <input id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
+        <input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="••••••">
         <button class="btn" id="verify">אימות</button>
         <div style="text-align:center;margin-top:10px"><button class="ghost" id="again">שליחת קוד חדש</button></div>
       </div>
@@ -157,7 +157,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     if (r.level === 'h') meetBox($('meetBox'), r, true);
     $('title').textContent = r.title;
     if (r.group && r.group.length > 1) { $('title').textContent = r.title + ' · חותם/ת ' + r.seq + ' מתוך ' + r.of; var gb = $('title').parentNode; gb.parentNode.insertBefore(grpList(r.group, r.seq), gb.nextSibling); }
-    if (r.level === 'l') { lightGo(); return; } // חתימה קלה: בלי קוד
+    if (r.level === 'l') { var ft = document.querySelector('.foot'); if (ft) ft.textContent = 'אביתר שוב – חברת עורכי דין · החתימה מתועדת: קישור אישי, מועד וטביעת אצבע דיגיטלית של המסמך'; lightGo(); return; } // חתימה קלה: בלי קוד
     if (r.otpPending) { $('codeBox').hidden = false; $('sendBox').hidden = true; $('waHelp').hidden = r.otpVia !== 'wa'; $('sentTo').textContent = 'כבר שלחנו לך קוד בן 6 ספרות' + (r.otpVia === 'wa' ? ' בוואטסאפ' : ' במייל') + '. מדביקים אותו כאן:'; } $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
     show('s1');
   }).catch(function (e) { $('s0').innerHTML = '<h1>לא ניתן לפתוח</h1><p class="lead"></p>'; $('s0').querySelector('p').textContent = e.message; });
