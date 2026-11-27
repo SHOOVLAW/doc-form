@@ -35,6 +35,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 .agree input{width:auto;margin-top:5px}
 .pad{width:100%;height:170px;border:1.5px dashed #b8bfcc;border-radius:12px;background:#fafbfc;touch-action:none;display:block}
 .row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:6px;color:var(--mut);font-size:13px}
+.grp{list-style:none;margin:10px 0;padding:0;display:grid;gap:6px}.grp li{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px}.grp .p{border-radius:9999px;padding:2px 10px;font-size:12.5px;font-weight:500;white-space:nowrap}.grp .p.s{background:#ecfdf3;color:var(--ok)}.grp .p.t{background:#e8eefb;color:var(--navy)}.grp .p.w{background:#fdf6e3;color:#9a6b00}.grp .me{font-weight:700}
 .ok{background:#ecfdf3;color:var(--ok);border-radius:12px;padding:14px;font-weight:500;text-align:center}
 .note{color:var(--mut);font-size:12.5px;margin-top:14px;text-align:center;font-weight:300}
 .foot{text-align:center;color:var(--mut);font-size:12.5px;margin-top:18px;font-weight:300}
@@ -121,6 +122,13 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   function busy(btn, on, t) { btn.disabled = on; if (t) btn.textContent = t; }
   function b64ToBytes(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
   function bytesToB64(u) { var s = '', ch = 0x8000; for (var i = 0; i < u.length; i += ch) s += String.fromCharCode.apply(null, u.subarray(i, i + ch)); return btoa(s); }
+  // כמה חותמים (27.11.26): רשימת מצב לכולם
+  function grpList(g, mySeq) {
+    var ul = document.createElement('ul'); ul.className = 'grp';
+    (g || []).forEach(function (x) { var li = document.createElement('li'); var n = document.createElement('span'); n.textContent = x.seq + '. ' + x.name + (x.seq === mySeq ? ' (את/ה)' : ''); if (x.seq === mySeq) n.className = 'me'; li.appendChild(n);
+      var p = document.createElement('span'); p.className = 'p ' + (x.st === 'signed' ? 's' : x.st === 'turn' ? 't' : 'w'); p.textContent = x.st === 'signed' ? '✓ חתם/ה' + (x.at ? ' ' + fmt(new Date(x.at)).slice(0, 16) : '') : x.st === 'turn' ? 'תורו/ה עכשיו' : x.st === 'cancel' ? 'בוטל' : 'ממתין/ה'; li.appendChild(p); ul.appendChild(li); });
+    return ul;
+  }
   function fmt(d) { var z = function (n) { return ('0' + n).slice(-2); }; return z(d.getDate()) + '.' + z(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()); }
 
   if (!/^[a-f0-9]{64}$/.test(TOK) && !/^[a-z0-9]{10}$/.test(TOK)) { $('s0').innerHTML = '<h1>הקישור אינו תקין</h1><p class="lead">כדאי לפתוח שוב את הקישור מההודעה שקיבלת מהמשרד.</p>'; return; }
@@ -128,11 +136,12 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 
   call('open', TOK, navigator.userAgent).then(function (r) {
     INFO = r;
-    if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; return; }
+    if (r.st === 'signed') { show('s3'); $('okt').textContent = 'המסמך "' + r.title + '" כבר נחתם. תודה!'; if (r.group && r.group.length > 1) $('okt').parentNode.insertBefore(grpList(r.group, r.seq), $('okt').nextSibling); return; }
     $('hi').textContent = (r.name ? 'שלום ' + r.name + ', ' : '') + 'מסמך לחתימה';
     if (r.wa) $('codeWa').hidden = false;
     if (r.level === 'h') meetBox($('meetBox'), r, true);
     $('title').textContent = r.title;
+    if (r.group && r.group.length > 1) { $('title').textContent = r.title + ' · חותם/ת ' + r.seq + ' מתוך ' + r.of; var gb = $('title').parentNode; gb.parentNode.insertBefore(grpList(r.group, r.seq), gb.nextSibling); }
     if (r.otpPending) { $('codeBox').hidden = false; $('sendBox').hidden = true; $('waHelp').hidden = r.otpVia !== 'wa'; $('sentTo').textContent = 'כבר שלחנו לך קוד בן 6 ספרות' + (r.otpVia === 'wa' ? ' בוואטסאפ' : ' במייל') + '. מדביקים אותו כאן:'; } $('exp').textContent = 'בתוקף עד ' + fmt(new Date(r.exp)).slice(0, 10);
     show('s1');
   }).catch(function (e) { $('s0').innerHTML = '<h1>לא ניתן לפתוח</h1><p class="lead"></p>'; $('s0').querySelector('p').textContent = e.message; });
@@ -260,7 +269,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     line('אביתר שוב – חברת עורכי דין', 30, 500, '#576175');
     line('דף חתימה אלקטרונית', 52, 700, '#172a4f'); y += 10;
     g.fillStyle = '#dfa620'; g.fillRect(110, y - 30, W - 220, 3); y += 30;
-    line('מסמך: ' + INFO.title, 32); line('החותם: ' + (INFO.name || ''), 32); line('מועד החתימה: ' + when, 32);
+    line('מסמך: ' + INFO.title, 32); line('החותם: ' + (INFO.name || '') + (INFO.of > 1 ? '  (חותם/ת ' + INFO.seq + ' מתוך ' + INFO.of + ')' : ''), 32); line('מועד החתימה: ' + when, 32);
     line('אימות: קוד חד-פעמי שנשלח ל-' + (INFO.mail || 'מייל שבתיק'), 32); line('מזהה בקשה: ' + REF, 32);
     line('טביעת אצבע של המסמך המקורי (SHA-256):', 26, 400, '#576175');
     g.direction = 'ltr'; g.textAlign = 'right'; line(H0.slice(0, 32), 24, 400, '#576175'); line(H0.slice(32), 24, 400, '#576175'); g.direction = 'rtl';
@@ -287,13 +296,14 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
     var when = fmt(new Date()), out;
     PDFLib.PDFDocument.load(ORIG, { ignoreEncryption: true }).then(function (doc) {
       return Promise.all([doc.embedPng(png(footer(when))), doc.embedPng(png(signPage(when)))]).then(function (im) {
-        doc.getPages().forEach(function (pg) { var s = pg.getSize(), w = Math.min(s.width - 40, 420), h = w * 40 / 1400; pg.drawImage(im[0], { x: (s.width - w) / 2, y: 4, width: w, height: h }); });
+        doc.getPages().forEach(function (pg) { var s = pg.getSize(), w = Math.min(s.width - 40, 420), h = w * 40 / 1400; pg.drawImage(im[0], { x: (s.width - w) / 2, y: 4 + Math.max(0, (INFO.seq || 1) - 1) * (h + 2), width: w, height: h }); });
         var last = doc.addPage([595.28, 841.89]); last.drawImage(im[1], { x: 0, y: 0, width: 595.28, height: 841.89 });
         doc.setModificationDate(new Date()); return doc.save();
       });
     }).then(function (bytes) { out = bytes; return call('done', TOK, SESS, { data: bytesToB64(bytes), ua: navigator.userAgent, tzo: new Date().getTimezoneOffset() }); })
-      .then(function () {
+      .then(function (d) {
         show('s3'); $('okt').textContent = 'המסמך "' + INFO.title + '" נחתם ונשלח למשרד. תודה!';
+        if (d && d.group && d.group.length > 1) { $('okt').textContent = d.next ? 'חתמת ✓ – המסמך הועבר כעת לחתימת ' + d.next.name : 'חתמת ✓ – כל החותמים חתמו. המסמך החתום נשלח למשרד.'; $('okt').parentNode.insertBefore(grpList(d.group, INFO.seq), $('okt').nextSibling); }
         say('');
       }).catch(function (e) { say(e.message || 'החתימה לא נשמרה – אפשר לנסות שוב', true); busy(btn, false, 'חתימה ושליחה למשרד'); });
   };
