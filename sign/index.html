@@ -244,7 +244,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
 
   function render(bytes, final) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    return pdfjsLib.getDocument({ data: bytes.slice() }).promise.then(function (pdf) {
+    return pdfjsLib.getDocument({ data: bytes.slice(), cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/', cMapPacked: true, standardFontDataUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/standard_fonts/' }).promise.then(function (pdf) {
       var box = $('pages'); box.innerHTML = ''; var chain = Promise.resolve();
       for (var i = 1; i <= pdf.numPages; i++) (function (n) {
         chain = chain.then(function () { return pdf.getPage(n); }).then(function (pg) {
@@ -263,7 +263,7 @@ input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(23,42,79,.1)}
   function fsOpen() {
     $('fs').hidden = false; document.body.style.overflow = 'hidden'; fsSize();
     var src = OUT || ORIG; if (!src || FS.src === src) return; FS.src = src; $('fsPages').innerHTML = '';
-    pdfjsLib.getDocument({ data: src.slice() }).promise.then(function (pdf) {
+    pdfjsLib.getDocument({ data: src.slice(), cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/', cMapPacked: true, standardFontDataUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/standard_fonts/' }).promise.then(function (pdf) {
       var chain = Promise.resolve();
       for (var i = 1; i <= pdf.numPages; i++) (function (n) {
         chain = chain.then(function () { return pdf.getPage(n); }).then(function (pg) {
